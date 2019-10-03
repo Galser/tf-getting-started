@@ -51,7 +51,7 @@ Skills map - 200 Terraform, getting started from installing until remote
     terraform apply
     ```
     
-    Output start : 
+    Output starts : 
     ```
     An execution plan has been generated and is shown below.
     Resource actions are indicated with the following symbols:
@@ -170,7 +170,6 @@ Skills map - 200 Terraform, getting started from installing until remote
 # todo
 
 
-- [ ] - Destroy Infrastructure
 - [ ] - Resource Dependencies
 - [ ] - Provision
 - [ ] - Input Variables
@@ -183,3 +182,4 @@ Skills map - 200 Terraform, getting started from installing until remote
 - [x] - Installing Terraform
 - [x] - Build Infrastructure
 - [x] - Change Infrastructure
+- [x] - Destroy Infrastructure
