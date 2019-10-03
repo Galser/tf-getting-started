@@ -51,7 +51,7 @@ Skills map - 200 Terraform, getting started from installing until remote
     terraform apply
     ```
     
-    Output start : 
+    Output starts : 
     ```
     An execution plan has been generated and is shown below.
     Resource actions are indicated with the following symbols:
@@ -135,12 +135,41 @@ Skills map - 200 Terraform, getting started from installing until remote
 
     Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
     ```
+### Destroy infra
 
+- Follow this post : https://learn.hashicorp.com/terraform/getting-started/destroy 
+- My output : 
+    ```
+    aws_instance.example: Refreshing state... [id=i-0048a50ed241b6a2a]
+
+    An execution plan has been generated and is shown below.
+    Resource actions are indicated with the following symbols:
+    - destroy
+
+    Terraform will perform the following actions:
+
+    # aws_instance.example will be destroyed
+    - resource "aws_instance" "example" {
+        - ami                          = "ami-048d25c1bda4feda7" -> null
+        - arn                          = "arn:aws:ec2:eu-central-1:729476260648:instance/i-0048a50ed241b6a2a" -> null
+        - associate_public_ip_address  = true -> null
+        - availability_zone            = "eu-central-1c" -> null
+    ```
+    ...
+    and after `yes` :
+    ```
+    aws_instance.example: Destroying... [id=i-0048a50ed241b6a2a]
+    aws_instance.example: Still destroying... [id=i-0048a50ed241b6a2a, 10s elapsed]
+    aws_instance.example: Still destroying... [id=i-0048a50ed241b6a2a, 20s elapsed]
+    aws_instance.example: Destruction complete after 30s
+
+    Destroy complete! Resources: 1 destroyed.
+    ```
+    
 
 # todo
 
 
-- [ ] - Destroy Infrastructure
 - [ ] - Resource Dependencies
 - [ ] - Provision
 - [ ] - Input Variables
@@ -153,3 +182,4 @@ Skills map - 200 Terraform, getting started from installing until remote
 - [x] - Installing Terraform
 - [x] - Build Infrastructure
 - [x] - Change Infrastructure
+- [x] - Destroy Infrastructure
