@@ -4,6 +4,6 @@ provider "aws" {
 }
 
 resource "aws_instance" "example" {
-  ami           = "ami-08a162fe1419adb2a" # Ubuntu 18.04.3 Bionic, EU
+  ami           = "ami-048d25c1bda4feda7" # Ubuntu 18.04.3 Bionic, custom
   instance_type = "t2.micro"
 }
