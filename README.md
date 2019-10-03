@@ -3,7 +3,7 @@ Skills map - 200 Terraform, getting started from installing until remote
 
 # Subgoals progress
 
-> Note : All the steps been executed and test on macOS Mojave , version 10.14.6 (18G95)
+> Note : All the steps been executed and tested on macOS Mojave , version 10.14.6 (18G95)
 
 
 ### Install Terraform 
