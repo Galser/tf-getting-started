@@ -207,7 +207,7 @@ Skills map - 200 Terraform, getting started from installing until remote
     ```
     As shown above, Terraform created the EC2 instance before creating the Elastic IP address. Due to the interpolation expression that passes the ID of the EC2 instance to the Elastic IP address, Terraform is able to infer a dependency, and knows it must create the instance first.
 - Now tune the configuration by adding another EC2 instance:
-    ```
+    ```terraform
     resource "aws_instance" "another" {
       ami           = "ami-08a162fe1419adb2a"
       instance_type = "t2.micro"
@@ -230,12 +230,55 @@ Skills map - 200 Terraform, getting started from installing until remote
     Because this new instance does not depend on any other resource, it can be created in parallel with the other resources. Where possible, Terraform will perform operations concurrently to reduce the total time taken to apply changes.
 
 - Before moving on, remove this new resource from your configuration and run `terraform apply` again to destroy it. 
-    
+
+### Provision
+
+- Following this post : https://learn.hashicorp.com/terraform/getting-started/provision
+- Modify code so the instance description looks like:
+    ```terraform
+    resource "aws_instance" "example" {
+        ami           = "ami-048d25c1bda4feda7" # Ubuntu 18.04.3 Bionic, custom
+        instance_type = "t2.micro"
+
+        # new provisioner 
+        provisioner "local-exec" {
+            command = "echo ${aws_instance.example.public_ip} > ip_address.txt"
+        }  
+    }
+    ```
+- Provisioners are only run when a resource is created. Make sure that your infrastructure is **destroyed** if it isn't already, then run **apply**:
+    ```
+    terraform apply
+    ```
+    Observe output  :
+    ```
+    ...
+    aws_instance.example: Creating...
+    aws_instance.example: Still creating... [10s elapsed]
+    aws_instance.example: Still creating... [20s elapsed]
+    aws_instance.example: Still creating... [30s elapsed]
+    aws_instance.example: Provisioning with 'local-exec'...
+    aws_instance.example (local-exec): Executing: ["/bin/sh" "-c" "echo 18.185.90.184 > ip_address.txt"]
+    aws_instance.example: Creation complete after 33s [id=i-07be38b2d9f304a56]
+    aws_eip.ip: Creating...
+    aws_eip.ip: Creation complete after 1s [id=eipalloc-0897dd71fad317f86]
+    ```
+    You can clear see : **Provisioning with 'local-exec'...**
+    Terraform will output anything from provisioners to the console, but in this case there is no direct output. However, we can verify everything worked by looking at the ip_address.txt file:
+    ```shell
+    $ cat ip_address.txt
+    18.185.90.184
+    ```
+    > Note : Your IP address may differ
+
+
+
+
+
 
 # todo
 
 
-- [ ] - Provision
 - [ ] - Input Variables
 - [ ] - Output Variables
 - [ ] - Modules
@@ -248,3 +291,4 @@ Skills map - 200 Terraform, getting started from installing until remote
 - [x] - Change Infrastructure
 - [x] - Destroy Infrastructure
 - [x] - Resource Dependencies
+- [x] - Provision
