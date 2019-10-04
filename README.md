@@ -320,10 +320,34 @@ This defines the region variables within your Terraform configuration. There is 
     As you can see from Terraform output above - the change in AMI forces replacement, e.g. now we using correct AMI for correct region from our defined map. 
 
 
+### Output Variables
+
+- According to the : https://learn.hashicorp.com/terraform/getting-started/outputs
+- Let's define an output to show us the public IP address of the elastic IP address that we create. Adding this to `main.tf` file:
+    ```terraform
+    output "ip" {
+    value = aws_eip.ip.public_ip
+    }
+    ```
+- Run `terraform apply` to populate the output. This only needs to be done once after the output is defined. The apply output should change slightly. At the end you should see this:
+    ```
+    Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+    Outputs:
+
+    ip = 18.197.2.11
+    ```
+    apply highlights the outputs. You can also query the outputs after apply-time using `terraform output`: 
+    ```
+    $ terraform output ip
+    18.197.2.11
+    ```
+
+
 # todo
 
-- [ ] - Output Variables
 - [ ] - Modules
+
 
 # done
 
@@ -335,3 +359,4 @@ This defines the region variables within your Terraform configuration. There is 
 - [x] - Resource Dependencies
 - [x] - Provision
 - [x] - Input Variables
+- [x] - Output Variables
