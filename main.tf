@@ -1,10 +1,11 @@
 provider "aws" {
   profile    = "default"
-  region     = "eu-central-1"
+  region     = "${var.region}"
 }
 
 resource "aws_instance" "example" {
-  ami           = "ami-048d25c1bda4feda7" # Ubuntu 18.04.3 Bionic, custom
+  ami                   = var.amis[var.region]
+
   instance_type = "t2.micro"
 
   # new provisioner 

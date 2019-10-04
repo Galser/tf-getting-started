@@ -271,15 +271,57 @@ Skills map - 200 Terraform, getting started from installing until remote
     ```
     > Note : Your IP address may differ
 
+### Input Variables
+- According to the :  https://learn.hashicorp.com/terraform/getting-started/variables
+- Let's first extract our region into a variable. Create another file `variables.tf` with the following contents.
+    ```terraform
+    variable "region" {
+    default = "eu-central-1"
+    }
+    ```
+This defines the region variables within your Terraform configuration. There is a default value, but is optional. Otherwise, If no default is set, the variable is required.
+> Note: that the file can be named anything, since Terraform loads all files ending in .tf in a directory. 
 
+- Next, replace the AWS provider configuration with the following:
+    ```terraform
+    provider "aws" {
+    region     = var.region
+    }
+    ```
+    This uses more interpolations, this time prefixed with `var.` . This tells Terraform that you're accessing variables. This configures the AWS provider with the given variables.
 
+- We've replaced our sensitive strings with variables, but we still are hard-coding AMIs. Unfortunately, AMIs are specific to the region that is in use. One option is to just ask the user to input the proper AMI for the region, but Terraform can do better than that with maps.
 
+    Maps are a way to create variables that are lookup tables. An example will show this best. Let's extract our AMIs into a map and add support for the *us-east-2* region as well,
+    add to `variables.tf` file : 
+    ```terraform
+    variable "amis" {
+        type = "map"
+        
+        default = {
+        "us-east-2"    = "ami-00f03cfdc90a7a4dd",
+        "eu-central-1" = "ami-08a162fe1419adb2a"
+        }
+    } 
+    ```
+- Run apply to test it. 
+    ```
+    $ terraform apply
+    ...
+    -/+ resource "aws_instance" "example" {
+      ~ ami                          = "ami-048d25c1bda4feda7" -> "ami-08a162fe1419adb2a" # forces replacement
+    ...
+    aws_instance.example: Provisioning with 'local-exec'...
+    aws_instance.example (local-exec): Executing: ["/bin/sh" "-c" "echo 3.123.39.78 > ip_address.txt"]
+    aws_instance.example: Creation complete after 32s [id=i-051b87b927fd30940]
+    aws_eip.ip: Modifying... [id=eipalloc-0897dd71fad317f86]
+    aws_eip.ip: Modifications complete after 1s [id=eipalloc-0897dd71fad317f86]
+    ```
+    As you can see from Terraform output above - the change in AMI forces replacement, e.g. now we using correct AMI for correct region from our defined map. 
 
 
 # todo
 
-
-- [ ] - Input Variables
 - [ ] - Output Variables
 - [ ] - Modules
 
@@ -292,3 +334,4 @@ Skills map - 200 Terraform, getting started from installing until remote
 - [x] - Destroy Infrastructure
 - [x] - Resource Dependencies
 - [x] - Provision
+- [x] - Input Variables
