@@ -3,22 +3,22 @@ provider "aws" {
   region     = "${var.region}"
 }
 
-resource "aws_instance" "example" {
+module "nginxweb" {
+  source                = "./nginxweb"
+
   ami                   = var.amis[var.region]
+  instance_type         = "t2.micro"
+  subnet_id             = var.subnet_ids[var.region]
+  vpc_security_group_id = var.vpc_security_group_ids[var.region]
 
-  instance_type = "t2.micro"
-
-  # new provisioner 
-  provisioner "local-exec" {
-      command = "echo ${aws_instance.example.public_ip} > ip_address.txt"
-  }  
+  learntag = "${var.learntag}"
+  
 }
 
-resource "aws_eip" "ip" {
-    vpc = true
-    instance = aws_instance.example.id
+output "public_ip" {
+  value = "${module.nginxweb.public_ip}"
 }
 
-output "ip" {
-  value = aws_eip.ip.public_ip
+output "public_dns" {
+  value = "${module.nginxweb.public_dns}"
 }
