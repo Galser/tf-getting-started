@@ -276,7 +276,7 @@ Skills map - 200 Terraform, getting started from installing until remote
 - Let's first extract our region into a variable. Create another file `variables.tf` with the following contents.
     ```terraform
     variable "region" {
-    default = "eu-central-1"
+      default = "eu-central-1"
     }
     ```
 This defines the region variables within your Terraform configuration. There is a default value, but is optional. Otherwise, If no default is set, the variable is required.
@@ -285,10 +285,10 @@ This defines the region variables within your Terraform configuration. There is 
 - Next, replace the AWS provider configuration with the following:
     ```terraform
     provider "aws" {
-    region     = var.region
+      region     = var.region
     }
     ```
-    This uses more interpolations, this time prefixed with `var.` . This tells Terraform that you're accessing variables. This configures the AWS provider with the given variables.
+    This uses more interpolations, this time prefixed with `var.` and it tells Terraform that you're accessing variables. This configures the AWS provider with the given variables.
 
 - We've replaced our sensitive strings with variables, but we still are hard-coding AMIs. Unfortunately, AMIs are specific to the region that is in use. One option is to just ask the user to input the proper AMI for the region, but Terraform can do better than that with maps.
 
@@ -326,7 +326,7 @@ This defines the region variables within your Terraform configuration. There is 
 - Let's define an output to show us the public IP address of the elastic IP address that we create. Adding this to `main.tf` file:
     ```terraform
     output "ip" {
-    value = aws_eip.ip.public_ip
+      value = aws_eip.ip.public_ip
     }
     ```
 - Run `terraform apply` to populate the output. This only needs to be done once after the output is defined. The apply output should change slightly. At the end you should see this:
@@ -337,7 +337,7 @@ This defines the region variables within your Terraform configuration. There is 
 
     ip = 18.197.2.11
     ```
-    apply highlights the outputs. You can also query the outputs after apply-time using `terraform output`: 
+    apply **highlights** the outputs. You can also query the outputs after apply-time using `terraform output`: 
     ```
     $ terraform output ip
     18.197.2.11
@@ -348,9 +348,9 @@ This defines the region variables within your Terraform configuration. There is 
 > Notes : Getting started on modules now https://learn.hashicorp.com/terraform/getting-started/modules can not be used right now in Terraform version 0.12
 So I've created my own module to deploy set of web-servers with small Go program that drawing Lissajous figures
 
-- We going ot use module locate in folder [nginxweb](nginxweb)
+- We going to use custom module located in folder [nginxweb](nginxweb)
 
-- Changing `main.tf`, removing all except provider definition and adding : 
+- Changing `main.tf`, removing all except provider definition at teh very beginning and add : 
     ```terraform
     module "nginxweb" {
         source                = "./nginxweb"
@@ -372,35 +372,35 @@ So I've created my own module to deploy set of web-servers with small Go program
         value = "${module.nginxweb.public_dns}"
     }
     ```
-    This is reflecting usage of locally available module 'nginxweb'
+    This is reflecting usage of locally available module **nginxweb**
 - Also adding some additional variables to the `variables.tf` to parametrize the code :
     ```terraform
     # used later to delete all those instances
     variable "learntag" {
-    type    = "string"
-    default = "200tf"
+      type    = "string"
+      default = "200tf"
     }
 
     variable "subnet_ids" {
-    type = "map"
-    default = {
-        "eu-central-1" = "subnet-7282ce1a"
-    }
+      type = "map"
+      default = {
+          "eu-central-1" = "subnet-7282ce1a"
+      }
     }
 
     variable "vpc_security_group_ids" {
-    type = "map"
-    default = {
-        "us-east-2"    = ""
-        "eu-central-1" = "sg-04c059aea335d8f69"
-    }
+      type = "map"
+      default = {
+          "us-east-2"    = ""
+          "eu-central-1" = "sg-04c059aea335d8f69"
+      }
     }
 
     variable "instance_type" {
-    default = "t2.micro"
+      default = "t2.micro"
     }
     ```
-- Before using `apply` for first time we need to informt terraform about our module. Execute :
+- Before using `apply` for first time with above mentioned code we need to inform terraform about our module. Execute :
     ```
     terraform init
     ```
@@ -433,7 +433,7 @@ So I've created my own module to deploy set of web-servers with small Go program
     "3.120.251.230",
     ]
     ```   
-    So, the module had created and provisioned set of 3 servers running basic Nginx web server. Let's check that our servers indeed can server web pages. Checking with `cURL`  one of the IPs from outputs :
+    So, the module had created and provisioned set of 3 servers running basic Nginx web server. Let's check that our servers indeed can server web pages. Checking with [cURL](https://curl.haxx.se/)  one of the IPs from outputs :
     ```html
      curl 18.195.23.15
         <!DOCTYPE html>
@@ -445,7 +445,7 @@ So I've created my own module to deploy set of web-servers with small Go program
                 width: 35em;
     ```
     All good, module performs as expected.
-- As the last step run :
+- As the last step run `destroy` to clean:
     ```
     terraform destroy
     ```
