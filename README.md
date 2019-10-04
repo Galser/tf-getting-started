@@ -31,10 +31,10 @@ Skills map - 200 Terraform, getting started from installing until remote
     - Region : `eu-central-1`
     - AMI : `ami-08a162fe1419adb2a`
 - After typing and saving all the code, we still need to :
-    - Arrange AWS auth credentials via env variables : 
+    - Arrange AWS auth credentials (You can create security credentials on [this page](https://console.aws.amazon.com/iam/home?#security_credential).) via env variables, execute in command line : 
     ```
-    export AWS_ACCESS_KEY_ID="anaccesskey"
-    export AWS_SECRET_ACCESS_KEY="asecretkey"
+    export AWS_ACCESS_KEY_ID="YOUR ACCESS KEY"
+    export AWS_SECRET_ACCESS_KEY="YOUR SECRET KEY"
     ```
     - The first command to run for a new configuration -- or after checking out an existing configuration from version control -- is 
     ```
@@ -45,8 +45,8 @@ Skills map - 200 Terraform, getting started from installing until remote
     ```
     terraform plan
     ```
-    > BUT - Note -  in the latest version of the Terraform we cna just go with apply immediately, see below 
-- So, just apply code by executing :
+    > Note -  in the latest version of the Terraform we can just go with apply immediately, see below 
+- And apply code to create infrastructure by executing :
     ```
     terraform apply
     ```
@@ -67,8 +67,7 @@ Skills map - 200 Terraform, getting started from installing until remote
             + availability_zone            = (known after apply)
             + cpu_core_count               = (known after apply)
     ```
-    we skip middle part ...
-    Output ends with : 
+    we skip middle part...output ends with : 
     ```
     Plan: 1 to add, 0 to change, 0 to destroy.
 
@@ -103,7 +102,7 @@ Skills map - 200 Terraform, getting started from installing until remote
 - Modification for my case : 
     - Region : `eu-central-1`
     - AMI : `ami-048d25c1bda4feda7`
-- Change code
+- Change code according to the tutorial
 - To apply changes run :
     ```
     terraform apply
@@ -126,7 +125,7 @@ Skills map - 200 Terraform, getting started from installing until remote
     ```
     > Note that prefix -/+ means that Terraform will destroy and recreate the resource, rather than updating it in-place. While some attributes can be updated in-place (which are shown with the ~ prefix), changing the AMI for an EC2 instance requires recreating it. Terraform handles these details for you, and the execution plan makes it clear what Terraform will do.
     
-    Answer yes to teh Terraform's question, and here is the possible output : 
+    Answer yes to the Terraform's question, and here is the possible output : 
     ```
     aws_instance.example: Destroying... [id=i-018d5c68823d11250]
     aws_instance.example: Still destroying... [id=i-018d5c68823d11250, 10s elapsed]
@@ -193,7 +192,7 @@ Skills map - 200 Terraform, getting started from installing until remote
     # aws_eip.ip will be created
     + resource "aws_eip" "ip" {
         + allocation_id     = (known after apply)
-      ```
+    ```
     Terraform will create two resources: the instance and the elastic IP. In the "instance" value for the "aws_eip", you can see the raw interpolation is still present. This is because this variable won't be known until the "aws_instance" is created. It will be replaced at apply-time.
     Answer yes, and observe : 
     ```
@@ -210,8 +209,8 @@ Skills map - 200 Terraform, getting started from installing until remote
 - Now tune the configuration by adding another EC2 instance:
     ```
     resource "aws_instance" "another" {
-    ami           = "ami-08a162fe1419adb2a"
-    instance_type = "t2.micro"
+      ami           = "ami-08a162fe1419adb2a"
+      instance_type = "t2.micro"
     }
     ```
 - Run :
@@ -236,7 +235,6 @@ Skills map - 200 Terraform, getting started from installing until remote
 # todo
 
 
-- [ ] - Resource Dependencies
 - [ ] - Provision
 - [ ] - Input Variables
 - [ ] - Output Variables
@@ -249,3 +247,4 @@ Skills map - 200 Terraform, getting started from installing until remote
 - [x] - Build Infrastructure
 - [x] - Change Infrastructure
 - [x] - Destroy Infrastructure
+- [x] - Resource Dependencies
