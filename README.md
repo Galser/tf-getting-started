@@ -343,10 +343,127 @@ This defines the region variables within your Terraform configuration. There is 
     18.197.2.11
     ```
 
+### Modules
+
+> Notes : Getting started on modules now https://learn.hashicorp.com/terraform/getting-started/modules can not be used right now in Terraform version 0.12
+So I've created my own module to deploy set of web-servers with small Go program that drawing Lissajous figures
+
+- We going ot use module locate in folder [nginxweb](nginxweb)
+
+- Changing `main.tf`, removing all except provider definition and adding : 
+    ```terraform
+    module "nginxweb" {
+        source                = "./nginxweb"
+
+        ami                   = var.amis[var.region]
+        instance_type         = "t2.micro"
+        subnet_id             = var.subnet_ids[var.region]
+        vpc_security_group_id = var.vpc_security_group_ids[var.region]
+
+        learntag = "${var.learntag}"
+    
+    }
+
+    output "public_ip" {
+        value = "${module.nginxweb.public_ip}"
+    }
+
+    output "public_dns" {
+        value = "${module.nginxweb.public_dns}"
+    }
+    ```
+    This is reflecting usage of locally available module 'nginxweb'
+- Also adding some additional variables to the `variables.tf` to parametrize the code :
+    ```terraform
+    # used later to delete all those instances
+    variable "learntag" {
+    type    = "string"
+    default = "200tf"
+    }
+
+    variable "subnet_ids" {
+    type = "map"
+    default = {
+        "eu-central-1" = "subnet-7282ce1a"
+    }
+    }
+
+    variable "vpc_security_group_ids" {
+    type = "map"
+    default = {
+        "us-east-2"    = ""
+        "eu-central-1" = "sg-04c059aea335d8f69"
+    }
+    }
+
+    variable "instance_type" {
+    default = "t2.micro"
+    }
+    ```
+- Before using `apply` for first time we need to informt terraform about our module. Execute :
+    ```
+    terraform init
+    ```
+    Output :
+    ```
+    Initializing modules...
+    - nginxweb in nginxweb
+    ...
+    ```
+- Now let's apply our code changes : 
+    ```
+    terraform apply
+    ```
+    Output after some time :
+    ```
+    module.nginxweb.aws_instance.nginxweb[1]: Creation complete after 1m39s [id=i-0c52a4281a4505d15]
+
+    Apply complete! Resources: 4 added, 0 changed, 0 destroyed.
+
+    Outputs:
+
+    public_dns = [
+    "ec2-18-195-23-15.eu-central-1.compute.amazonaws.com",
+    "ec2-52-59-244-189.eu-central-1.compute.amazonaws.com",
+    "ec2-3-120-251-230.eu-central-1.compute.amazonaws.com",
+    ]
+    public_ip = [
+    "18.195.23.15",
+    "52.59.244.189",
+    "3.120.251.230",
+    ]
+    ```   
+    So, the module had created and provisioned set of 3 servers running basic Nginx web server. Let's check that our servers indeed can server web pages. Checking with `cURL`  one of the IPs from outputs :
+    ```html
+     curl 18.195.23.15
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>Welcome to nginx!</title>
+        <style>
+            body {
+                width: 35em;
+    ```
+    All good, module performs as expected.
+- As the last step run :
+    ```
+    terraform destroy
+    ```
+    Output:
+    ```
+    module.nginxweb.aws_instance.nginxweb[2]: Destruction complete after 30s
+    module.nginxweb.aws_instance.nginxweb[0]: Destruction complete after 30s
+    module.nginxweb.aws_instance.nginxweb[1]: Destruction complete after 30s
+    module.nginxweb.aws_key_pair.tf200-aguselietov: Destroying... [id=aguselietov-key]
+    module.nginxweb.aws_key_pair.tf200-aguselietov: Destruction complete after 1s
+
+    Destroy complete! Resources: 4 destroyed.
+    ```
+That's conclude the "Getting Started"
+
 
 # todo
 
-- [ ] - Modules
 
 
 # done
@@ -360,3 +477,4 @@ This defines the region variables within your Terraform configuration. There is 
 - [x] - Provision
 - [x] - Input Variables
 - [x] - Output Variables
+- [x] - Modules
