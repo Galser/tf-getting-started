@@ -105,6 +105,9 @@ Skills map - 200 Terraform, getting started from installing until remote
     - AMI : `ami-048d25c1bda4feda7`
 - Change code
 - To apply changes run :
+    ```
+    terraform apply
+    ```
     Observe output start :
     ```
     aws_instance.example: Refreshing state... [id=i-018d5c68823d11250]
@@ -135,9 +138,15 @@ Skills map - 200 Terraform, getting started from installing until remote
 
     Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
     ```
+
+    
 ### Destroy infra
 
 - Follow this post : https://learn.hashicorp.com/terraform/getting-started/destroy 
+- To process run : 
+    ```
+    terraform destroy
+    ``` 
 - My output : 
     ```
     aws_instance.example: Refreshing state... [id=i-0048a50ed241b6a2a]
@@ -165,6 +174,63 @@ Skills map - 200 Terraform, getting started from installing until remote
 
     Destroy complete! Resources: 1 destroyed.
     ```
+    
+### Resource Dependencies
+
+- According to the part : https://learn.hashicorp.com/terraform/getting-started/dependencies
+- After adding proper code execute : 
+    ```
+    terraform apply
+    ```
+    Observe output start :
+    ```
+    An execution plan has been generated and is shown below.
+    Resource actions are indicated with the following symbols:
+    + create
+
+    Terraform will perform the following actions:
+
+    # aws_eip.ip will be created
+    + resource "aws_eip" "ip" {
+        + allocation_id     = (known after apply)
+      ```
+    Terraform will create two resources: the instance and the elastic IP. In the "instance" value for the "aws_eip", you can see the raw interpolation is still present. This is because this variable won't be known until the "aws_instance" is created. It will be replaced at apply-time.
+    Answer yes, and observe : 
+    ```
+    aws_instance.example: Creating...
+    aws_instance.example: Still creating... [10s elapsed]
+    aws_instance.example: Still creating... [20s elapsed]
+    aws_instance.example: Creation complete after 22s [id=i-0ab28845c5b11e3f9]
+    aws_eip.ip: Creating...
+    aws_eip.ip: Creation complete after 1s [id=eipalloc-04900480435a3f37c]
+
+    Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+    ```
+    As shown above, Terraform created the EC2 instance before creating the Elastic IP address. Due to the interpolation expression that passes the ID of the EC2 instance to the Elastic IP address, Terraform is able to infer a dependency, and knows it must create the instance first.
+- Now tune the configuration by adding another EC2 instance:
+    ```
+    resource "aws_instance" "another" {
+    ami           = "ami-08a162fe1419adb2a"
+    instance_type = "t2.micro"
+    }
+    ```
+- Run :
+    ```
+    terraform apply
+    ```
+    And confirm.
+    New instance added : 
+    ```
+    aws_instance.another: Creating...
+    aws_instance.another: Still creating... [10s elapsed]
+    aws_instance.another: Still creating... [20s elapsed]
+    aws_instance.another: Creation complete after 22s [id=i-0769313e8692105ae]
+
+    Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+    ```
+    Because this new instance does not depend on any other resource, it can be created in parallel with the other resources. Where possible, Terraform will perform operations concurrently to reduce the total time taken to apply changes.
+
+- Before moving on, remove this new resource from your configuration and run `terraform apply` again to destroy it. 
     
 
 # todo
